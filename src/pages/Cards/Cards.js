@@ -1,7 +1,7 @@
-import { CDBContainer } from "cdbreact";
+import { CDBBtn, CDBContainer } from "cdbreact";
 import React, { Fragment, useEffect, useState } from "react";
-import { Card } from "react-bootstrap";
-//import { Pie } from "react-chartjs-2";
+import { Button, Card, Modal } from "react-bootstrap";
+import Navbar from "../../components/Navbar/Navbar";
 import Sidebar from "../../components/Sidebar";
 
 import * as cardServices from "./../../services/CardServices";
@@ -9,6 +9,10 @@ import * as cardServices from "./../../services/CardServices";
 export default function Cards() {
   const [cards, setCards] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   useEffect(() => {
     setIsSearching(true);
@@ -34,6 +38,27 @@ export default function Cards() {
             overflowY: "hidden",
           }}
         >
+          <Navbar />
+
+          <CDBContainer className="d-flex">
+            <CDBBtn
+              color="primary"
+              onClick={() => {
+                handleShow();
+              }}
+              circle
+              outline
+            >
+              Criar
+            </CDBBtn>
+            <CDBBtn color="danger" circle outline>
+              Deletar
+            </CDBBtn>
+
+            <CDBBtn color="warning" circle outline>
+              Editar
+            </CDBBtn>
+          </CDBContainer>
           <h1>Cards</h1>
           <div style={{ overflowY: "scroll" }}>
             <div className="card-section d-flex">
@@ -117,6 +142,21 @@ export default function Cards() {
               </div>
             </div>
           </div>
+
+          <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>New Card</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>Test</Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Close
+              </Button>
+              <Button variant="primary" onClick={handleClose}>
+                Save Changes
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       </div>
     </Fragment>
