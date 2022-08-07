@@ -1,18 +1,28 @@
-import { Badge, Button, Form, Modal } from "react-bootstrap";
+import { Button, Form, Modal } from "react-bootstrap";
 import React, { Fragment, useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar/Navbar";
+import TagCard from "../../components/TagCard/TagCard";
 import * as tagServices from "./../../services/TagServices";
 import { CDBBtn, CDBContainer } from "cdbreact";
 
 export default function Tags() {
   const [tags, setTags] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [show, setShow] = useState(false);
   const [tagName, setTagName] = useState("");
+  const [selectedTag, setSelectedTag] = useState(undefined);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleClose = () => {
+    setSelectedTag(undefined);
+    setShow(false);
+  };
+  const handleShow = () => {
+    setTagName("");
+    setShow(true);
+  };
 
   useEffect(() => {
     setIsSearching(true);
@@ -27,6 +37,24 @@ export default function Tags() {
     tagServices.createTag(tag).then((response) => {
       console.log(response);
       handleClose();
+      window.location.reload();
+    });
+  }
+
+  function deleteTag(tag) {
+    setIsDeleting(true);
+    tagServices.deleteTag(tag.id).then((response) => {
+      console.log(response);
+      setIsDeleting(false);
+      window.location.reload();
+    });
+  }
+
+  function editTag(tag) {
+    setIsUpdating(true);
+    tagServices.editTag(tag).then((response) => {
+      console.log(response);
+      setIsUpdating(false);
       window.location.reload();
     });
   }
@@ -48,12 +76,9 @@ export default function Tags() {
         >
           <Navbar />
 
-          <CDBContainer className="d-flex">
+          <CDBContainer>
             <CDBBtn color="primary" onClick={handleShow} circle outline>
               Criar
-            </CDBBtn>
-            <CDBBtn color="danger" circle outline>
-              Deletar
             </CDBBtn>
 
             <CDBBtn color="warning" circle outline>
@@ -67,18 +92,24 @@ export default function Tags() {
               {!isSearching &&
                 tags &&
                 tags.map((item) => (
-                  <h1>
-                    <Badge className="m-3" bg="primary" key={item.id}>
-                      {item.title}
-                    </Badge>
-                  </h1>
+                  <TagCard
+                    tag={item}
+                    deleteHandler={() => {
+                      deleteTag(item);
+                    }}
+                    editHandler={() => {
+                      setSelectedTag(item);
+                      setTagName(item.title);
+                      setShow(true);
+                    }}
+                  />
                 ))}
             </div>
           </div>
 
           <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
-              <Modal.Title>New Tag</Modal.Title>
+              <Modal.Title>{selectedTag ? "Edit Tag" : "New Tag"}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form>
@@ -104,12 +135,25 @@ export default function Tags() {
                 Close
               </Button>
 
-              <Button
-                variant="success"
-                onClick={() => createTag({ title: tagName })}
-              >
-                Save
-              </Button>
+              {!selectedTag && (
+                <Button
+                  variant="success"
+                  onClick={() => createTag({ title: tagName })}
+                >
+                  Create
+                </Button>
+              )}
+
+              {selectedTag && (
+                <Button
+                  variant="warning"
+                  onClick={() =>
+                    editTag({ id: selectedTag.id, title: tagName })
+                  }
+                >
+                  Update
+                </Button>
+              )}
             </Modal.Footer>
           </Modal>
         </div>

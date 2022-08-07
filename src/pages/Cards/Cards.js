@@ -2,7 +2,7 @@ import { CDBBtn, CDBContainer } from "cdbreact";
 import React, { Fragment, useEffect, useState } from "react";
 import { Button, Card, Modal } from "react-bootstrap";
 import Navbar from "../../components/Navbar/Navbar";
-import Sidebar from "../../components/Sidebar";
+import Sidebar from "./../../components/Sidebar";
 
 import * as cardServices from "./../../services/CardServices";
 
